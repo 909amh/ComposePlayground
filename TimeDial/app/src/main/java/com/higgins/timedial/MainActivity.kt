@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.higgins.timedial.ui.theme.DefaultTheme
 import com.higgins.timedial.ui.timeDial.SingleDial
+import com.higgins.timedial.ui.timeDial.SingleDial2
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +35,7 @@ class MainActivity : ComponentActivity() {
                     contentAlignment = Alignment.Center
                 ) {
                     Row {
-                        SingleDial(
+                        SingleDial2(
                             values = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"),
                             startIndex = 0
                         )
