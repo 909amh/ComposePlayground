@@ -13,12 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -45,6 +47,7 @@ fun SingleDial(
 
     // The height of a single dial cell
     val cellHeight = 36.dp.dpToPx(density)
+    val cellHeightMap = remember { mutableStateMapOf<Int, Int>() }
 
     // The height of the container for the dial cells
     val columnHeight = (cellHeight * NUMBER_OF_CELLS).roundToInt().pxToDp(density)
@@ -56,7 +59,7 @@ fun SingleDial(
     val coercedDragOffsetY = dragOffsetY % cellHeight
     val draggableState = rememberDraggableState { delta ->
         dragOffsetY += delta
-        if (dragOffsetY >= cellHeight) {
+        if (dragOffsetY >= (cellHeightMap[CENTER_INDEX] ?: 80)) {
             val newIndex = currentStartIndex - 1
             currentStartIndex = if (newIndex < 0) {
                 values.lastIndex
@@ -64,7 +67,7 @@ fun SingleDial(
                 newIndex
             }
             dragOffsetY = 0f
-        } else if (dragOffsetY <= -cellHeight) {
+        } else if (dragOffsetY <= (-(cellHeightMap[CENTER_INDEX] ?: 80))) {
             val newIndex = currentStartIndex + 1
             currentStartIndex = if (newIndex >= values.size) 0 else newIndex
             dragOffsetY = 0f
@@ -96,7 +99,13 @@ fun SingleDial(
             val scale = calculateScale(
                 distanceFromCenter = distanceFromCenter,
                 dragOffset = dragOffsetY,
-                cellHeight = cellHeight
+                cellHeight = cellHeightMap[CENTER_INDEX] ?: 80
+            )
+
+            val yOffset = calculateYOffset(
+                distanceFromCenter = distanceFromCenter,
+                cellHeightMap = cellHeightMap,
+                index = index
             )
 
             DialSlot(
@@ -105,10 +114,13 @@ fun SingleDial(
                     .offset {
                         IntOffset(
                             x = 0,
-                            y = (distanceFromCenter * cellHeight.roundToInt())
+                            y = yOffset.roundToInt()
                         )
                     }
-                    .scale(scale),
+                    .scale(scale)
+                    .onGloballyPositioned {
+                        cellHeightMap[index] = it.size.height
+                    },
                 data = value,
                 fontSize = 14.sp
             )
@@ -116,13 +128,29 @@ fun SingleDial(
     }
 }
 
+private fun calculateYOffset(
+    index: Int,
+    distanceFromCenter: Int,
+    cellHeightMap: Map<Int, Int>
+): Float {
+    return if (distanceFromCenter < 0) {
+        -cellHeightMap.filterKeys { it < CENTER_INDEX && it >= index }.values.sumOf { it }.toFloat()
+
+    } else if (distanceFromCenter > 0) {
+        cellHeightMap.filterKeys { it > CENTER_INDEX && it <= index }.values.sumOf { it }.toFloat()
+    } else {
+        0f
+    }
+}
+
+
 /**
  * Calculates the scale of a cell based on it's index and the current progress of the dragOffset.
  */
 private fun calculateScale(
     distanceFromCenter: Int,
     dragOffset: Float,
-    cellHeight: Float
+    cellHeight: Int
 ): Float {
     val baseScale = calculateBaseScale(distanceFromCenter)
     val dragProgress = (dragOffset.absoluteValue / cellHeight)
