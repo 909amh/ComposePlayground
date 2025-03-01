@@ -63,6 +63,10 @@ fun SingleDial2(
                 newIndex
             }
             dragOffsetY = 0f
+        } else if (dragOffsetY <= -cellHeight) {
+            val newIndex = currentStartIndex + 1
+            currentStartIndex = if (newIndex > values.size) 0 else newIndex
+            dragOffsetY = 0f
         }
         Log.v(TAG, "Drag Offset: ${dragOffsetY}")
     }
