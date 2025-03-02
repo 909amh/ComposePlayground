@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.higgins.timedial.dpToPx
 import com.higgins.timedial.pxToDp
+import com.higgins.timedial.spToPx
 import com.higgins.timedial.ui.theme.DefaultTheme
 import com.higgins.timedial.wrap
 import kotlin.math.absoluteValue
@@ -46,7 +48,7 @@ fun SingleDial(
     val density = LocalDensity.current
 
     // The height of a single dial cell
-    val cellHeight = 36.dp.dpToPx(density)
+    val cellHeight = 24.sp.spToPx(density)
     val cellHeightMap = remember { mutableStateMapOf<Int, Int>() }
 
     // The height of the container for the dial cells
@@ -56,7 +58,7 @@ fun SingleDial(
 
     // The Y Offset from the drag gesture
     var dragOffsetY by remember { mutableFloatStateOf(0f) }
-    val coercedDragOffsetY = dragOffsetY % cellHeight
+    val coercedDragOffsetY = dragOffsetY % (cellHeightMap[CENTER_INDEX] ?: 80)
     val draggableState = rememberDraggableState { delta ->
         dragOffsetY += delta
         if (dragOffsetY >= (cellHeightMap[CENTER_INDEX] ?: 80)) {
@@ -117,12 +119,19 @@ fun SingleDial(
                             y = yOffset.roundToInt()
                         )
                     }
-                    .scale(scale)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    }
                     .onGloballyPositioned {
-                        cellHeightMap[index] = it.size.height
+                        Log.d(TAG, "On Globally Positioned")
+                        if (cellHeightMap[index] == null) {
+                            cellHeightMap[index] = it.size.height
+                        }
+                        Log.d(TAG, "Cell Height Map: ${cellHeightMap}")
                     },
                 data = value,
-                fontSize = 14.sp
+                fontSize = 24.sp
             )
         }
     }
@@ -178,11 +187,11 @@ private fun calculateBaseScale(
     distanceFromCenter: Int
 ): Float {
     return when (distanceFromCenter.absoluteValue) {
-        0 -> 3f
-        1 -> 2.5f
-        2 -> 2f
-        3 -> 1f
-        else -> 0.5f
+        0 -> 1f
+        1 -> 0.91f
+        2 -> 0.73f
+        3 -> 0.52f
+        else -> 0.0f
     }
 }
 

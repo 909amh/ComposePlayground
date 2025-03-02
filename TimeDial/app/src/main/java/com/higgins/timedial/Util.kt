@@ -2,6 +2,7 @@ package com.higgins.timedial
 
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 
 fun List<String>.wrap(firstIndex: Int, length: Int): List<String> {
     val size = this.size
@@ -20,3 +21,4 @@ fun List<String>.wrap(firstIndex: Int, length: Int): List<String> {
 
 fun Dp.dpToPx(density: Density) = with(density) { this@dpToPx.toPx() }
 fun Int.pxToDp(density: Density) = with(density) { this@pxToDp.toDp() }
+fun TextUnit.spToPx(density: Density) = with(density) { this@spToPx.toPx() }
