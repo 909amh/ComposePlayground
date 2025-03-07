@@ -7,6 +7,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.higgins.timedial.ui.theme.DefaultTheme
+import com.higgins.timedial.ui.timeDial.singleDial.calculateAlpha
+import com.higgins.timedial.ui.timeDial.singleDial.calculateBaseScale
 
 @Composable
 fun DialSlot(
@@ -19,6 +21,7 @@ fun DialSlot(
         text = data,
         fontSize = fontSize
     )
+    calculateBaseScale(0)
 }
 
 @Preview

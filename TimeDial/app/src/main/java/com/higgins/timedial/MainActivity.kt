@@ -12,8 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.higgins.timedial.ui.theme.DefaultTheme
-import com.higgins.timedial.ui.timeDial.NewSingleDial
-import com.higgins.timedial.ui.timeDial.SingleDial
+import com.higgins.timedial.ui.timeDial.singleDial.NewSingleDial
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
