@@ -7,9 +7,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.higgins.timedial.ui.theme.DefaultTheme
+import com.higgins.timedial.ui.timeDial.NewSingleDial
+import com.higgins.timedial.ui.timeDial.NumberPicker
 import com.higgins.timedial.ui.timeDial.SingleDial
 
 class MainActivity : ComponentActivity() {
@@ -24,10 +28,10 @@ class MainActivity : ComponentActivity() {
                     contentAlignment = Alignment.Center
                 ) {
                     Row {
-                        SingleDial(
-                            values = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"),
-                            startIndex = 0
+                        NewSingleDial(
+                            state = remember { mutableIntStateOf(0) }
                         )
+                        NumberPicker(remember { mutableIntStateOf(0) })
                     }
                 }
             }

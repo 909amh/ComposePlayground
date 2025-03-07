@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -68,11 +69,9 @@ fun SingleDial(
             } else {
                 newIndex
             }
-            dragOffsetY = 0f
         } else if (dragOffsetY <= (-(cellHeightMap[CENTER_INDEX] ?: 80))) {
             val newIndex = currentStartIndex + 1
             currentStartIndex = if (newIndex >= values.size) 0 else newIndex
-            dragOffsetY = 0f
         }
         Log.d(TAG, "Drag Offset: $dragOffsetY")
         Log.d(TAG, "Cell Height: $cellHeight")
@@ -90,7 +89,10 @@ fun SingleDial(
             }
             .draggable(
                 orientation = Orientation.Vertical,
-                state = draggableState
+                state = draggableState,
+                onDragStopped = {
+                    dragOffsetY = 0f
+                }
             )
     ) {
         val visibleValues = values.wrap(currentStartIndex, 9)
@@ -122,6 +124,7 @@ fun SingleDial(
                     .graphicsLayer {
                         scaleX = scale
                         scaleY = scale
+                        transformOrigin = TransformOrigin(0.5f, 1f)
                     }
                     .onGloballyPositioned {
                         Log.d(TAG, "On Globally Positioned")
