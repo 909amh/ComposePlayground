@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -90,10 +91,26 @@ fun NewSingleDial(
                     dragOffset = coercedAnimatedOffset,
                     cellHeight = halvedColumnHeightPx.roundToInt()
                 )
+                val xOffset = calculateXOffset(
+                    distanceFromCenter = relativeIndex,
+                    dragOffset = coercedAnimatedOffset,
+                    cellHeight = halvedColumnHeightPx.roundToInt()
+                )
+                val alpha = calculateAlpha(
+                    distanceFromCenter = relativeIndex,
+                    dragOffset = coercedAnimatedOffset,
+                    cellHeight = halvedColumnHeightPx.roundToInt()
+                )
                 DialSlot(
                     modifier = baseModifier
-                        .offset(y = halvedColumnHeight * relativeIndex)
-                        .scale(scale),
+                        .offset {
+                            IntOffset(
+                                x = xOffset.toInt(),
+                                y = (halvedColumnHeightPx * relativeIndex).toInt()
+                            )
+                        }
+                        .scale(scale)
+                        .alpha(alpha),
                     data = (animatedStateValue + relativeIndex).toString()
                 )
             }
@@ -138,6 +155,89 @@ private fun calculateBaseScale(
         3 -> 0.52f
         else -> 0.0f
     }
+}
+
+@Composable
+private fun calculateBaseXOffset(
+    distanceFromCenter: Int
+): Float {
+    val density = LocalDensity.current
+    return when (distanceFromCenter.absoluteValue) {
+        0 -> 0f
+        1 -> 1.dp.dpToPx(density)
+        2 -> 2.dp.dpToPx(density)
+        3 -> 3.dp.dpToPx(density)
+        4 -> 4.dp.dpToPx(density)
+        else -> 0f
+    }
+}
+
+@Composable
+private fun calculateXOffset(
+    distanceFromCenter: Int,
+    dragOffset: Float,
+    cellHeight: Int
+): Float {
+    val baseXOffset = calculateBaseXOffset(distanceFromCenter)
+    val dragProgress = dragOffset.absoluteValue / cellHeight
+
+    val finalXOffset = when {
+        // Dragging Down
+        dragOffset > 0f -> {
+            val nextIndex = distanceFromCenter + 1
+            val nextBaseXOffset = calculateBaseXOffset(nextIndex)
+            baseXOffset + (nextBaseXOffset - baseXOffset) * dragProgress
+        }
+        // Dragging Up
+        dragOffset < 0f -> {
+            val nextIndex = distanceFromCenter - 1
+            val nextBaseXOffset = calculateBaseXOffset(nextIndex)
+            baseXOffset + (nextBaseXOffset - baseXOffset) * dragProgress
+        }
+        else -> baseXOffset
+    }
+
+    return finalXOffset
+}
+
+private fun calculateBaseAlpha(
+    distanceFromCenter: Int
+): Float {
+    return when (distanceFromCenter.absoluteValue) {
+        0 -> 1f
+        1 -> 0.8f
+        2 -> 0.6f
+        3 -> 0.4f
+        4 -> 0.2f
+        else -> 1f
+    }
+}
+
+private fun calculateAlpha(
+    distanceFromCenter: Int,
+    dragOffset: Float,
+    cellHeight: Int
+): Float {
+    val baseAlpha = calculateBaseAlpha(distanceFromCenter)
+    val dragProgress = dragOffset.absoluteValue / cellHeight
+
+    val finalAlpha = when {
+        // Dragging Down
+        dragOffset > 0f -> {
+            val nextIndex = distanceFromCenter + 1
+            val nextBaseAlpha = calculateBaseAlpha(nextIndex)
+            baseAlpha + (nextBaseAlpha - baseAlpha) * dragProgress
+        }
+        // Dragging Up
+        dragOffset < 0f -> {
+            val nextIndex = distanceFromCenter - 1
+            val nextBaseAlpha = calculateBaseAlpha(nextIndex)
+            baseAlpha + (nextBaseAlpha - baseAlpha) * dragProgress
+        }
+        else -> baseAlpha
+    }
+
+    return finalAlpha
 }
 
 suspend fun Animatable<Float, AnimationVector1D>.fling(

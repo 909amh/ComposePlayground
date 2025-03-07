@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.higgins.timedial.ui.theme.DefaultTheme
 import com.higgins.timedial.ui.timeDial.NewSingleDial
-import com.higgins.timedial.ui.timeDial.NumberPicker
 import com.higgins.timedial.ui.timeDial.SingleDial
 
 class MainActivity : ComponentActivity() {
@@ -31,7 +30,6 @@ class MainActivity : ComponentActivity() {
                         NewSingleDial(
                             state = remember { mutableIntStateOf(0) }
                         )
-                        NumberPicker(remember { mutableIntStateOf(0) })
                     }
                 }
             }
