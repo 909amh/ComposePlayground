@@ -41,7 +41,7 @@ fun NewSingleDial(
     val scope = rememberCoroutineScope()
 
     val columnHeight = 200.dp
-    val halvedColumnHeight = columnHeight / NUMBER_OF_CELLS
+    val halvedColumnHeight = columnHeight / (NUMBER_OF_CELLS + 1)
     val halvedColumnHeightPx = halvedColumnHeight.dpToPx(density)
     val spacingMultiplier = 1.5f
     val cellHeightWithSpacing = halvedColumnHeightPx * spacingMultiplier
@@ -69,6 +69,19 @@ fun NewSingleDial(
                     scope.launch {
                         animatedOffset.snapTo(animatedOffset.value + deltaY)
                     }
+                },
+                onDragStopped = {
+                    val remainingOffset = animatedOffset.value % cellHeightWithSpacing
+                    val target = if (remainingOffset.absoluteValue > cellHeightWithSpacing / 2) {
+                        if (remainingOffset > 0) {
+                            animatedOffset.value + (cellHeightWithSpacing - remainingOffset)
+                        } else {
+                            animatedOffset.value - (cellHeightWithSpacing + remainingOffset)
+                        }
+                    } else {
+                        animatedOffset.value - remainingOffset
+                    }
+                    animatedOffset.animateTo(target)
                 }
             )
     ) {
@@ -80,7 +93,8 @@ fun NewSingleDial(
             if (showCenterLines) {
                 HorizontalDivider(
                     modifier = Modifier
-                        .offset { IntOffset(0, -halvedColumnHeightPx.roundToInt() / NUMBER_OF_CELLS) }
+                        .align(Alignment.Center)
+                        .offset { IntOffset(0, (-cellHeightWithSpacing / 2).toInt()) }
                 )
             }
             Box(
@@ -136,7 +150,8 @@ fun NewSingleDial(
             if (showCenterLines) {
                 HorizontalDivider(
                     modifier = Modifier
-                        .offset { IntOffset(0, halvedColumnHeightPx.roundToInt()) }
+                        .align(Alignment.Center)
+                        .offset { IntOffset(0, cellHeightWithSpacing.roundToInt() / 2) }
                 )
             }
         }
