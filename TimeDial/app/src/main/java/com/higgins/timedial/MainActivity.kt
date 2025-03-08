@@ -27,7 +27,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Row {
                         NewSingleDial(
-                            state = remember { mutableIntStateOf(0) }
+                            state = remember { mutableIntStateOf(0) },
+                            showCenterLines = true
                         )
                     }
                 }

@@ -6,7 +6,7 @@ import androidx.compose.ui.unit.dp
 import com.higgins.timedial.dpToPx
 import kotlin.math.absoluteValue
 
-internal fun calculateScale(
+fun calculateScale(
     distanceFromCenter: Int,
     dragOffset: Float,
     cellHeight: Int
